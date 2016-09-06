@@ -3,10 +3,12 @@ package net.changeden.annotationproject.annotations.manager;
 import android.content.Context;
 import android.util.Log;
 
+import net.changeden.annotationproject.annotations.annotation.listenerAnnotation.OnClick;
 import net.changeden.annotationproject.annotations.annotation.paramsAnnotation.OnResize;
 import net.changeden.annotationproject.annotations.annotation.paramsAnnotation.OnSetMargin;
 import net.changeden.annotationproject.annotations.annotation.paramsAnnotation.OnSetPadding;
 import net.changeden.annotationproject.annotations.annotation.paramsAnnotation.OnSetTextSize;
+import net.changeden.annotationproject.annotations.manager.listenerAnnotation.OnClickManager;
 import net.changeden.annotationproject.annotations.manager.paramsAnnotation.OnResizeManager;
 import net.changeden.annotationproject.annotations.manager.paramsAnnotation.OnSetMarginManager;
 import net.changeden.annotationproject.annotations.manager.paramsAnnotation.OnSetPaddingManager;
@@ -155,6 +157,8 @@ public class AnnotationManager {
                         OnSetPaddingManager.getInstance().init(scale, object, field);
                     } else if (annotation instanceof OnSetTextSize) {
                         OnSetTextSizeManager.getInstance().init(scale, object, field);
+                    }else if(annotation instanceof OnClick){
+                        OnClickManager.getInstance().init(scale,object,field);
                     }
                 }
             }

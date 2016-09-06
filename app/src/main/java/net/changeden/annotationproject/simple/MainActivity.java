@@ -6,9 +6,11 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
+import android.view.View;
 import android.widget.TextView;
 
 import net.changeden.annotationproject.R;
+import net.changeden.annotationproject.annotations.annotation.listenerAnnotation.OnClick;
 import net.changeden.annotationproject.annotations.annotation.paramsAnnotation.OnResize;
 import net.changeden.annotationproject.annotations.annotation.paramsAnnotation.OnSetMargin;
 import net.changeden.annotationproject.annotations.annotation.paramsAnnotation.OnSetPadding;
@@ -41,9 +43,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @OnClick(id=R.id.textView,methodName = "onClick",hasParams = true)
     @OnSetTextSize(id=R.id.textView,size = 30,unit = TypedValue.COMPLEX_UNIT_PX)
     @OnSetPadding(id=R.id.textView,padding = 20)
     @OnSetMargin(id=R.id.textView,margin = 10)
     @OnResize(id = R.id.textView,width = 540,height = 100)
     TextView textView;
+
+    public void onClick(View view){
+        System.out.println("点击了有参 onClick 参数="+view);
+    }
+
+    public void onClick(){
+        System.out.println("点击了无参 onClick");
+    }
 }
