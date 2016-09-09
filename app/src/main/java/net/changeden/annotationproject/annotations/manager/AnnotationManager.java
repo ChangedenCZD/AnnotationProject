@@ -1,6 +1,8 @@
 package net.changeden.annotationproject.annotations.manager;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import net.changeden.annotationproject.annotations.annotation.listenerAnnotation.OnClick;
@@ -14,6 +16,7 @@ import net.changeden.annotationproject.annotations.manager.paramsAnnotation.OnSe
 import net.changeden.annotationproject.annotations.manager.paramsAnnotation.OnSetPaddingManager;
 import net.changeden.annotationproject.annotations.manager.paramsAnnotation.OnSetTextSizeManager;
 import net.changeden.annotationproject.annotations.manager.support.AnnotationViewGetterInterface;
+import net.changeden.annotationproject.annotations.manager.support.OnAnnotationInitCallback;
 import net.changeden.annotationproject.annotations.tools.AppParams;
 
 import java.lang.annotation.Annotation;
@@ -24,13 +27,31 @@ import java.lang.reflect.Field;
  * <br>自定义注解管理器
  */
 public class AnnotationManager {
+    /**
+     * 是否为 Debug 模式
+     */
     private static boolean debug = false;
 
+    /**
+     * 用于存放 activity 对象
+     */
     private android.app.Activity activity;
+    /**
+     * 用于存放 android.app.Fragment 对象
+     */
     private android.app.Fragment app_fragment;
+    /**
+     * 用于存放 android.support.v4.app.Fragment 对象
+     */
     private android.support.v4.app.Fragment v4_fragment;
+    /**
+     * 用于存放 AnnotationViewGetterInterface 对象
+     */
     private AnnotationViewGetterInterface viewGetterInterface;
 
+    /**
+     * 缩放比例
+     */
     private static float scale = 0;
 
     /**
@@ -64,6 +85,67 @@ public class AnnotationManager {
     /**
      * <br>初始化
      * <br>可在 android.app.Activity的onCreate方法中调用
+     *
+     * @param scale 传入自定义的缩放比例
+     * @see android.app.Activity
+     */
+    public void init(android.app.Activity activity, float scale) {
+        init(null, activity, scale, new OnAnnotationInitCallback<android.app.Activity>() {
+            public void onInit(Context context, android.app.Activity activity, float scale) {
+                init(activity);
+            }
+        });
+    }
+
+    /**
+     * <br>初始化
+     * <br>可在 android.app.Fragment的onViewCreated方法中调用
+     *
+     * @param scale 传入自定义的缩放比例
+     * @see android.app.Fragment
+     */
+    public void init(android.app.Fragment fragment, float scale) {
+        init(null, fragment, scale, new OnAnnotationInitCallback<android.app.Fragment>() {
+            public void onInit(Context context, android.app.Fragment fragment, float scale) {
+                init(fragment);
+            }
+        });
+    }
+
+    /**
+     * <br>初始化
+     * <br>可在 android.support.v4.app.Fragment的onViewCreated方法调用
+     *
+     * @param scale 传入自定义的缩放比例
+     * @see android.support.v4.app.Fragment
+     */
+    public void init(android.support.v4.app.Fragment fragment, float scale) {
+        init(null, fragment, scale, new OnAnnotationInitCallback<android.support.v4.app.Fragment>() {
+            public void onInit(Context context, android.support.v4.app.Fragment fragment, float scale) {
+                init(fragment);
+            }
+        });
+    }
+
+    /**
+     * <br>初始化
+     * <br>使用前，必须实现 AnnotationViewGetterInterface 接口
+     *
+     * @param scale 传入自定义的缩放比例
+     * @see AnnotationViewGetterInterface
+     */
+    public void init(Context context, AnnotationViewGetterInterface viewGetterInterface, float scale) {
+        init(context, viewGetterInterface, scale, new OnAnnotationInitCallback<AnnotationViewGetterInterface>() {
+            public void onInit(Context context, AnnotationViewGetterInterface viewGetterInterface, float scale) {
+                init(context, viewGetterInterface);
+            }
+        });
+    }
+
+    /**
+     * <br>初始化
+     * <br>可在 android.app.Activity的onCreate方法中调用
+     *
      * @see android.app.Activity
      */
     public void init(android.app.Activity activity) {
@@ -157,12 +239,22 @@ public class AnnotationManager {
                         OnSetPaddingManager.getInstance().init(scale, object, field);
                     } else if (annotation instanceof OnSetTextSize) {
                         OnSetTextSizeManager.getInstance().init(scale, object, field);
-                    }else if(annotation instanceof OnClick){
-                        OnClickManager.getInstance().init(scale,object,field);
+                    } else if (annotation instanceof OnClick) {
+                        OnClickManager.getInstance().init(scale, object, field);
                     }
                 }
             }
         }
+    }
+
+    /**
+     * 封装 代理模式 初始化
+     */
+    private <T> void init(@Nullable Context context, @NonNull T t, float scale,@NonNull OnAnnotationInitCallback callback) {
+        float sourceScale = AnnotationManager.scale;
+        AnnotationManager.scale = scale;
+        callback.onInit(context, t, scale);
+        AnnotationManager.scale = sourceScale;
     }
 
     /**
